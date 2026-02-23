@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI-Based Supervisory Governance</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+font-family:Inter,Arial;
+background:#f4f6f9;
+height:100vh;
+}
+
+/* HEADER */
+.header{
+height:60px;
+background:#0f172a;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center; 
+padding:0 25px;
+font-weight:600;
+}
+
+/* LAYOUT */
+.container{
+display:grid;
+grid-template-columns:260px 1fr 320px;
+height:calc(100vh - 60px);
+gap:16px;
+padding:16px;
+}
+
+/* PANELS */
+.panel{
+background:white;
+border-radius:12px;
+padding:16px;
+box-shadow:0 2px 6px rgba(0,0,0,0.05);
+overflow:auto;
+}
+
+.title{
+font-weight:600;
+margin-bottom:12px;
+}
+
+/* FILTERS */
+.filter-item{
+margin-bottom:14px;
+}
+
+select{
+width:100%;
+padding:8px;
+border-radius:6px;
+border:1px solid #ddd;
+}
+
+/* KPI */
+.kpis{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+margin-bottom:16px;
+}
+
+.kpi{
+background:#f1f5f9;
+padding:12px;
+border-radius:8px;
+font-size:14px;
+}
+
+.kpi strong{
+display:block;
+font-size:22px;
+}
+
+/* TABLE */
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+td,th{
+padding:10px;
+border-bottom:1px solid #eee;
+text-align:left;
+}
+
+tr:hover{
+background:#f8fafc;
+cursor:pointer;
+}
+
+/* HEATMAP */
+.heatmap{
+display:grid;
+grid-template-columns:120px repeat(4,1fr);
+gap:6px;
+font-size:13px;
+}
+
+.cell{
+padding:10px;
+border-radius:6px;
+text-align:center;
+}
+
+.green{background:#86efac;}
+.yellow{background:#fde68a;}
+.red{background:#fca5a5;}
+
+/* RESIDUAL SCORE */
+.score{
+font-size:36px;
+font-weight:700;
+color:#ef4444;
+}
+
+/* MODAL */
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+align-items:center;
+justify-content:center;
+}
+
+.modal-content{
+background:white;
+width:700px;
+border-radius:12px;
+padding:24px;
+}
+
+.close{
+float:right;
+cursor:pointer;
+font-weight:600;
+}
+
+/* --- BANK MODAL REPORT STYLING --- */
+.kpi-report{
+  display:flex;
+  gap:16px;
+  margin-bottom:16px;
+}
+
+.kpi-box{
+  flex:1;
+  background:#f1f5f9;
+  padding:16px;
+  border-radius:8px;
+  text-align:center;
+  font-size:14px;
+}
+
+.kpi-box strong{
+  display:block;
+  font-size:24px;
+  margin-bottom:4px;
+}
+
+.risk-report{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.risk-box{
+  padding:12px;
+  border-radius:8px;
+  font-weight:600;
+  color:white;
+  text-align:center;
+}
+
+.risk-box.red{background:#ef4444;}
+.risk-box.yellow{background:#f59e0b;}
+.risk-box.green{background:#22c55e;}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+AI-Based Supervisory Governance
+</div>
+
+<div class="container">
+
+<!-- LEFT FILTER PANEL -->
+<div class="panel">
+<div class="title">Supervisory Filters</div>
+
+<div class="filter-item">
+Bank Size
+<select id="bankSize">
+<option>All</option>
+<option>Systemic</option>
+<option>Medium</option>
+<option>Small</option>
+</select>
+</div>
+
+<div class="filter-item">
+Risk Level
+<select id="riskLevel">
+<option>All</option>
+<option>High</option>
+<option>Medium</option>
+<option>Low</option>
+</select>
+</div>
+
+<div class="filter-item">
+Risk Factor
+<select id="riskFactor">
+<option>All</option>
+<option>Governance</option>
+<option>Compliance</option>
+<option>Financial Crime</option>
+<option>Liquidity</option>
+</select>
+</div>
+
+<div class="filter-item">
+Inspection Status
+<select id="inspectionStatus">
+<option>All</option>
+<option>Due</option>
+<option>Completed</option>
+</select>
+</div>
+
+</div>
+
+<!-- CENTER MAIN VIEW -->
+<div class="panel">
+
+<div class="title">Risk Overview</div>
+
+<div class="kpis">
+<div class="kpi"><strong id="kpiBanks">6</strong>High Priority Banks</div>
+<div class="kpi"><strong id="kpiAnomalies">4</strong>New Anomalies</div>
+<div class="kpi"><strong id="kpiGov">3</strong>Governance Risk Signals</div>
+<div class="kpi"><strong id="kpiRisk">+12%</strong>Sector Risk Change</div>
+</div>
+
+<div class="title">Supervisory Alerts</div>
+
+<table>
+<tr>
+<th>Bank</th>
+<th>Alert</th>
+<th>Severity</th>
+<th>Action</th>
+</tr>
+
+<tr onclick="openBank('Bank8')">
+<td>Bank8</td>
+<td>Control Failure</td>
+<td>High</td>
+<td>On-site Inspection</td>
+</tr>
+
+<tr onclick="openBank('Bank12')">
+<td>Bank12</td>
+<td>Risk Spike</td>
+<td>Medium</td>
+<td>Review Controls</td>
+</tr>
+
+<tr onclick="openBank('Bank2')">
+<td>Bank2</td>
+<td>Governance Change</td>
+<td>High</td>
+<td>Immediate Review</td>
+</tr>
+</table>
+
+<br>
+<br>
+<div class="title">Risk Anomaly Heatmap</div>
+<p style="font-size:13px;color:#64748b;margin-bottom:10px;">
+Identifies abnormal risk patterns across key areas to quickly detect emerging supervisory concerns.
+</p>
+
+<div class="heatmap">
+<div></div>
+<div>Governance</div>
+<div>Control</div>
+<div>Compliance</div>
+<div>Financial Crime</div>
+
+<div>Bank1</div>
+<div class="cell green">Normal</div>
+<div class="cell green">Normal</div>
+<div class="cell yellow">Moderate</div>
+<div class="cell green">Normal</div>
+
+<div>Bank8</div>
+<div class="cell red">Anomaly</div>
+<div class="cell red">Anomaly</div>
+<div class="cell red">Anomaly</div>
+<div class="cell yellow">Moderate</div>
+
+<div>Bank2</div>
+<div class="cell green">Normal</div>
+<div class="cell yellow">Moderate</div>
+<div class="cell green">Normal</div>
+<div class="cell green">Normal</div>
+</div>
+<br>
+<br>
+
+<div class="title">Peer Anomaly Detection</div>
+<p style="font-size:13px;color:#64748b;margin-bottom:10px;">
+Compares banks against peers to highlight outliers and uncover hidden systemic risk.
+</p>
+
+<table id="peerTable">
+<tr>
+<th>Bank</th>
+<th>Peer Risk Deviation</th>
+<th>Status</th>
+</tr>
+
+<tr>
+<td>Bank8</td>
+<td>+45% vs peer avg</td>
+<td style="color:#ef4444;font-weight:600;">Outlier</td>
+</tr>
+
+<tr>
+<td>Bank12</td>
+<td>+18% vs peer avg</td>
+<td style="color:#f59e0b;font-weight:600;">Moderate</td>
+</tr>
+
+<tr>
+<td>Bank2</td>
+<td>+3% vs peer avg</td>
+<td style="color:#22c55e;font-weight:600;">Normal</td>
+</tr>
+</table>
+
+</div>
+
+<!-- RIGHT AI INSIGHTS PANEL -->
+<div class="panel">
+
+<div class="title">Dynamic Scoring for Residual Risk</div>
+<p style="font-size:13px;color:#64748b;margin-bottom:8px;">
+Shows remaining risk after controls — helps prioritize supervisory intervention.
+</p>
+
+<div class="score" id="dynamicScore">20</div>
+<p id="priorityLevel">Priority Level: High</p>
+
+<br>
+
+<div class="title">Risk Drivers</div>
+<ul id="riskDrivers">
+<li>+ Governance decline</li>
+<li>+ Peer anomaly detected</li>
+<li>+ Repeated compliance breaches</li>
+</ul>
+
+<br>
+
+<div class="title">Inspection Recommendation</div>
+<p id="inspectionRecommendation">
+Immediate inspection recommended.  
+Focus on governance and control effectiveness.
+</p>
+
+<br>
+
+<div class="title">AI Summary</div>
+<p>
+Risk increase driven by declining control effectiveness and abnormal behavior relative to peer institutions.
+</p>
+
+</div>
+
+</div>
+
+<!-- DRILL DOWN BANK PROFILE MODAL -->
+<div class="modal" id="bankModal">
+<div class="modal-content">
+<span class="close" onclick="closeBank()">Close</span>
+
+<h2 id="bankName">Bank Profile</h2>
+
+<br>
+
+<!-- KPI BOXES -->
+<div class="kpi-report">
+  <div class="kpi-box">
+    <strong id="bankScore">82</strong>
+    <span>Current Risk Score</span>
+  </div>
+  <div class="kpi-box">
+    <strong id="prevScore">65</strong>
+    <span>Previous Score</span>
+  </div>
+  <div class="kpi-box">
+    <strong id="priorityLevelModal">High</strong>
+    <span>Priority Level</span>
+  </div>
+</div>
+
+<br>
+
+<!-- RISK BREAKDOWN -->
+<div class="risk-report">
+  <div class="risk-box red">Governance Risk: High</div>
+  <div class="risk-box red">Compliance Risk: High</div>
+  <div class="risk-box yellow">Operational Risk: Medium</div>
+  <div class="risk-box yellow">Financial Crime Risk: Medium</div>
+</div>
+
+<br>
+
+<h3>AI Explanation</h3>
+<p>
+Risk increase driven by governance instability and abnormal exposure patterns compared to peer banks.
+</p>
+
+<br>
+
+<h3>Recommended Supervisory Action</h3>
+<p>Conduct targeted on-site inspection.</p>
+
+</div>
+</div>
+
+<script>
+
+/* ---------- FILTER UPDATES ---------- */
+
+const filters=["bankSize","riskLevel","riskFactor","inspectionStatus"];
+
+filters.forEach(id=>{
+document.getElementById(id).addEventListener("change",updateDashboard);
+});
+
+function updateDashboard(){
+document.getElementById("kpiBanks").innerText=Math.floor(Math.random()*10)+1;
+document.getElementById("kpiAnomalies").innerText=Math.floor(Math.random()*6);
+document.getElementById("kpiGov").innerText=Math.floor(Math.random()*5);
+document.getElementById("kpiRisk").innerText=(Math.floor(Math.random()*20)-5)+"%";
+
+updatePeerTable();
+}
+
+/* ---------- PEER ANOMALY UPDATE ---------- */
+
+function updatePeerTable(){
+const rows=document.querySelectorAll("#peerTable tr:not(:first-child)");
+
+rows.forEach(row=>{
+const deviation=Math.floor(Math.random()*50);
+let status="Normal";
+let color="#22c55e";
+
+if(deviation>30){status="Outlier";color="#ef4444";}
+else if(deviation>15){status="Moderate";color="#f59e0b";}
+
+row.cells[1].innerText="+"+deviation+"% vs peer avg";
+row.cells[2].innerText=status;
+row.cells[2].style.color=color;
+});
+}
+
+/* ---------- BANK CLICK → UPDATE RESIDUAL RISK ---------- */
+
+function openBank(name){
+
+document.getElementById("bankModal").style.display="flex";
+document.getElementById("bankName").innerText=name+" Profile";
+
+const bankData={
+
+Bank8:{
+score:20,
+priority:"High",
+drivers:["+ Very deficient controls","+ Governance decline","+ Peer anomaly"],
+action:"Immediate inspection recommended. Focus on governance and controls."
+},
+
+Bank12:{
+score:20,
+priority:"High",
+drivers:["+ Very deficient controls","+ Risk spike"],
+action:"Immediate supervisory review."
+},
+
+Bank2:{
+score:4,
+priority:"Medium Low",
+drivers:["+ Moderate inherent risk","+ Strong controls"],
+action:"Continue monitoring."
+}
+};
+
+const data=bankData[name] || bankData["Bank8"];
+
+// UPDATE KPI BOXES
+document.getElementById("bankScore").innerText=data.score;
+document.getElementById("prevScore").innerText=Math.max(data.score-15,0); // Example prev score
+document.getElementById("priorityLevelModal").innerText=data.priority;
+
+document.getElementById("dynamicScore").innerText=data.score;
+document.getElementById("priorityLevel").innerText="Priority Level: "+data.priority;
+
+document.getElementById("riskDrivers").innerHTML=
+data.drivers.map(d=>`<li>${d}</li>`).join("");
+
+document.getElementById("inspectionRecommendation").innerText=data.action;
+}
+
+function closeBank(){
+document.getElementById("bankModal").style.display="none";
+}
+
+</script>
+
+</body>
+</html>
